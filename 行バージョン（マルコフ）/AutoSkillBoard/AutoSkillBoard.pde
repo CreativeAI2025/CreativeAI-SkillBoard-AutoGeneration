@@ -4,6 +4,8 @@ PFont font;
 int cols = 11;
 int rows = 11;
 int cellSize = 75;
+int retryCount = 0;
+int maxRetry = 1000;
 
 PVector[][] prev = new PVector[cols][rows];
 boolean[][] nodechack = new boolean[cols][rows];
@@ -20,6 +22,8 @@ HashMap<String, Integer> inDegreeMap = new HashMap<>();//入力カウント
 HashMap<String, Integer> outDegreeMap = new HashMap<>();//出力カウント
 HashMap<Integer, ArrayList<Integer>> inOutSamples = new HashMap<>();
 HashMap<Integer, float[]> branchProbByInDegree = new HashMap<>();
+HashMap<String, Integer> debugInDegreeMap = new HashMap<>();
+HashMap<String, Integer> debugOutDegreeMap = new HashMap<>();
 
 void setup() {
   fullScreen();
@@ -34,8 +38,6 @@ void setup() {
   cloudNodesLimit();
   //cloudLinesLimit();
   setupBranchingDistributionFromData();
-
-  noLoop();
 }
 
 void draw() {
@@ -43,10 +45,29 @@ void draw() {
   drawGrid();
   nodeSet();
   drawLine();
+  debugInDegreeMap = new HashMap<>(inDegreeMap);
+  debugOutDegreeMap = new HashMap<>(outDegreeMap);
   applyBranchingBasedOnInDegree();
+  regenerateDisconnectedNodes();
 
   if (showDebug) {
     drawDebugInfo();
+  }
+
+  println("Retry Count: " + retryCount);
+
+  fill(0);
+  textSize(20);
+  text("Retry Count: " + retryCount, 100, 30);
+
+  if (!hasIsolatedNodes() || retryCount > maxRetry) {
+    noLoop();
+  } else {
+    retryCount++;
+    reset();
+    setRowDistances();
+    cloudNodesLimit();
+    setupBranchingDistributionFromData();  // 再生成準備
   }
 }
 
@@ -72,10 +93,11 @@ int getBranchCountFromDistribution(int inDegree) {
   float sum = 0;
   for (int i = 0; i < probs.length; i++) {
     sum += probs[i];
-    if (r < sum) return i + 1;
+    if (r < sum) return i;
   }
-  return 1;
+  return probs.length - 1;
 }
+
 
 void reset() {
   for (int x = 0; x < cols; x++) {
@@ -224,22 +246,22 @@ void nodeSet() {
   }
 }
 
+class Node {
+  PVector pos;
+  int dist;
+  int x, y;
+
+  Node(PVector pos, int dist, int x, int y) {
+    this.pos = pos;
+    this.dist = dist;
+    this.x = x;
+    this.y = y;
+  }
+}
+
 void drawLine() {
   inDegreeMap.clear();
   outDegreeMap.clear();
-
-  class Node {
-    PVector pos;
-    int dist;
-    int x, y;
-
-    Node(PVector pos, int dist, int x, int y) {
-      this.pos = pos;
-      this.dist = dist;
-      this.x = x;
-      this.y = y;
-    }
-  }
 
   ArrayList<Node> allNodes = new ArrayList<>();
   HashMap<Integer, ArrayList<Node>> distMap = new HashMap<>();
@@ -309,22 +331,23 @@ void drawLine() {
   }
 }
 
-
-boolean showDebug = false;
+boolean showDebug = true;
 
 void keyPressed() {
   if (key == 'r' || key == 'R') {
     reset();
+    retryCount = 0;
     setRowDistances();
     cloudNodesLimit();
     setupBranchingDistributionFromData();
     //cloudLinesLimit();
+    loop();
     redraw();
   }
 
   if (key == 'd' || key == 'D') {
     showDebug = !showDebug;
-    redraw(); // 再描画が必要
+    redraw();
   }
 }
 
@@ -355,8 +378,8 @@ void drawDebugInfo() {
 
   // 並べた順で出力
   for (String key : sortedKeys) {
-    int inC = inDegreeMap.getOrDefault(key, 0);
-    int outC = outDegreeMap.getOrDefault(key, 0);
+    int inC = debugInDegreeMap.getOrDefault(key, 0);
+    int outC = debugOutDegreeMap.getOrDefault(key, 0);
     text(key + " → 入力: " + inC + ", 出力: " + outC, 100, y);
     y += 20;
   }
