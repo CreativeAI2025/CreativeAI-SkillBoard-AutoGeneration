@@ -19,7 +19,7 @@ void regenerateDisconnectedNodes() {//入力が0のノードを検出して再�
   drawAdditionalLinesFor(isolatedNodes);
 }
 
-void drawAdditionalLinesFor(ArrayList<String> keysToConnect) {//特定ノードのみ線を引く処理
+void drawAdditionalLinesFor(ArrayList<String> keysToConnect) {
   HashMap<String, Integer> branchCounts = new HashMap<>();
 
   for (String keyA : keysToConnect) {
@@ -30,17 +30,39 @@ void drawAdditionalLinesFor(ArrayList<String> keysToConnect) {//特定ノード�
     int d = dist[ax][ay];
     if (!nodePositionsPerRow.containsKey(d + 1)) continue;
 
+    // 次の行のx座標リスト（nodechackベース）を取得
+    ArrayList<Integer> xsNextRow = new ArrayList<>();
+    for (int x = 0; x < cols; x++) {
+      if (nodechack[x][d + 1]) xsNextRow.add(x);
+    }
+
+    // 現在行のx座標リスト
+    ArrayList<Integer> xsCurrentRow = new ArrayList<>();
+    for (int x = 0; x < cols; x++) {
+      if (nodechack[x][d]) xsCurrentRow.add(x);
+    }
+
+    // 今のノードの描画インデックス取得
+    int aIndex = xsCurrentRow.indexOf(ax);
+    if (aIndex == -1) continue; // 念のため
+
+    PVector aPos = nodePositionsPerRow.get(d).get(aIndex);
+
     ArrayList<Node> nextNodes = new ArrayList<>();
-    for (int i = 0; i < nodePositionsPerRow.get(d + 1).size(); i++) {
+    for (int i = 0; i < xsNextRow.size(); i++) {
+      int bx = xsNextRow.get(i);
       PVector pos = nodePositionsPerRow.get(d + 1).get(i);
-      int bx = i; // 同じ順番で生成された仮定
+
+      int mp = (int)random(1, 11); // ノードごとにMPを生成
+
       String keyB = bx + "," + (d + 1);
-      Node b = new Node(pos.copy(), d + 1, bx, d + 1);
+      Node b = new Node(pos.copy(), d + 1, bx, d + 1, mp);
       nextNodes.add(b);
+
+      mpMap.put(keyB, mp);
     }
 
     Collections.shuffle(nextNodes);
-    PVector aPos = nodePositionsPerRow.get(d).get(ax); // 自分の描画位置
 
     int countA = 0;
     int limitA = branchLimitPerNode.getOrDefault(keyA, 999);
@@ -65,6 +87,7 @@ void drawAdditionalLinesFor(ArrayList<String> keysToConnect) {//特定ノード�
     }
   }
 }
+
 
 boolean hasIsolatedNodes() {
   for (String key : nodeColors.keySet()) {

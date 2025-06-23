@@ -6,6 +6,7 @@ int rows = 11;
 int cellSize = 75;
 int retryCount = 0;
 int maxRetry = 1000;
+int globalMaxInput = 3;
 
 PVector[][] prev = new PVector[cols][rows];
 boolean[][] nodechack = new boolean[cols][rows];
@@ -16,6 +17,7 @@ int maxDist = 0;
 
 HashMap<Integer, Integer> nodeLimitPerDist = new HashMap<>();
 HashMap<String, Integer> branchLimitPerNode = new HashMap<>();
+HashMap<String, Integer> maxInputPerNode = new HashMap<>();
 HashMap<Integer, ArrayList<PVector>> nodePositionsPerRow = new HashMap<>();
 HashMap<String, Integer> nodeColors = new HashMap<>(); // ← 色の格納用
 HashMap<String, Integer> inDegreeMap = new HashMap<>();//入力カウント
@@ -24,6 +26,9 @@ HashMap<Integer, ArrayList<Integer>> inOutSamples = new HashMap<>();
 HashMap<Integer, float[]> branchProbByInDegree = new HashMap<>();
 HashMap<String, Integer> debugInDegreeMap = new HashMap<>();
 HashMap<String, Integer> debugOutDegreeMap = new HashMap<>();
+HashMap<String, Integer> mpMap = new HashMap<>();  // ノードのMP情報を保存
+HashMap<Integer, float[]> mpDistByLevel = new HashMap<>();
+HashMap<String, float[]> mpDistByColorType = new HashMap<>();
 
 void setup() {
   fullScreen();
@@ -33,7 +38,10 @@ void setup() {
   font = createFont("MS Gothic", 16);
   textFont(font);
 
+  mpData();
+
   reset();
+  inputPerBranch();
   setRowDistances();
   cloudNodesLimit();
   //cloudLinesLimit();
@@ -98,6 +106,17 @@ int getBranchCountFromDistribution(int inDegree) {
   return probs.length - 1;
 }
 
+// MPをサンプリングする関数を定義
+int getMpFromDistribution(float[] probs) {
+  float r = random(1);
+  float sum = 0;
+  for (int i = 0; i < probs.length; i++) {
+    sum += probs[i];
+    if (r < sum) return i + 1;
+  }
+  return probs.length;
+}
+
 
 void reset() {
   for (int x = 0; x < cols; x++) {
@@ -108,7 +127,12 @@ void reset() {
       visited[x][y] = false;
     }
   }
+  
   maxDist = 0;
+  maxInputPerNode.clear();
+  
+  inputPerBranch();
+  
   branchLimitPerNode.clear();
   nodePositionsPerRow.clear();
   nodeColors.clear();
@@ -246,19 +270,6 @@ void nodeSet() {
   }
 }
 
-class Node {
-  PVector pos;
-  int dist;
-  int x, y;
-
-  Node(PVector pos, int dist, int x, int y) {
-    this.pos = pos;
-    this.dist = dist;
-    this.x = x;
-    this.y = y;
-  }
-}
-
 void drawLine() {
   inDegreeMap.clear();
   outDegreeMap.clear();
@@ -279,8 +290,49 @@ void drawLine() {
     for (int i = 0; i < posList.size(); i++) {
       int xOrig = xsInRow.get(i);
       PVector pos = posList.get(i);
-      Node node = new Node(pos.copy(), dist[xOrig][y], xOrig, y);
+
+      String key = xOrig + "," + y;
+
+      // 色相を取得
+      int c = nodeColors.get(key);
+      float nodeHue = hue(c);
+
+      // 色系に基づくMP分布を決定
+      float[] distByColor;
+      if (nodeHue >= 340 || nodeHue <= 20) {
+        distByColor = mpDistByColorType.get("red");
+      } else if (nodeHue >= 210 && nodeHue <= 250) {
+        distByColor = mpDistByColorType.get("blue");
+      } else {
+        distByColor = new float[] {0.1f, 0.1f, 0.1f, 0.1f, 0.1f, 0.1f, 0.1f, 0.1f, 0.1f, 0.1f};
+      }
+
+      // 階層yに対応する分布を取得
+      float[] distByLevel = mpDistByLevel.getOrDefault(y, new float[] {0.1f, 0.1f, 0.1f, 0.1f, 0.1f, 0.1f, 0.1f, 0.1f, 0.1f, 0.1f});
+
+      // ２つの分布を掛け合わせて正規化
+      float[] combinedDist = new float[distByLevel.length];
+      float sum = 0;
+      for (int j = 0; j < combinedDist.length; j++) {
+        combinedDist[j] = distByLevel[j] * distByColor[j];
+        sum += combinedDist[j];
+      }
+      for (int j = 0; j < combinedDist.length; j++) combinedDist[j] /= sum;
+
+      // MP決定
+      int mp = getMpFromDistribution(combinedDist);
+
+      Node node = new Node(pos.copy(), dist[xOrig][y], xOrig, y, mp);
       allNodes.add(node);
+
+      fill(0);
+      textSize(12);
+      textAlign(CENTER, CENTER);
+      text("MP: " + node.mp, node.pos.x, node.pos.y + cellSize / 3);//MP表示
+
+      // MPをマップに保存
+      mpMap.put(key, mp);
+
       if (!distMap.containsKey(node.dist)) distMap.put(node.dist, new ArrayList<>());
       distMap.get(node.dist).add(node);
     }
@@ -300,21 +352,30 @@ void drawLine() {
 
       String keyB = b.x + "," + b.y;
 
+      // 最新の入力数を取得
+      int currentInput = inDegreeMap.getOrDefault(keyB, 0);
+
+      // 入力数制限をチェック（これを超えるならスキップ）
+      int maxInput = maxInputPerNode.getOrDefault(keyB, globalMaxInput);
+      if (currentInput >= maxInput) {
+        continue;
+      }
+
       // 線を描画
       float hueVal = map(a.dist, 0, maxDist, 0, 360);
       stroke(hueVal, 80, 100, 200);
       strokeWeight(2);
       line(a.pos.x, a.pos.y, b.pos.x, b.pos.y);
 
-      // 出力・入力カウント
+      // 出力・入力カウントの更新（ここで1加算）
       outDegreeMap.put(keyA, outDegreeMap.getOrDefault(keyA, 0) + 1);
-      inDegreeMap.put(keyB, inDegreeMap.getOrDefault(keyB, 0) + 1);
+      inDegreeMap.put(keyB, currentInput + 1);
 
       // 出力制限数を更新
       countA++;
       branchCounts.put(keyA, countA);
 
-      // --- 入力に基づく出力分岐数のデータ記録 ---
+      // 入出力サンプル記録
       int inDeg = inDegreeMap.getOrDefault(keyB, 0);
       int outDeg = outDegreeMap.getOrDefault(keyB, 0);
       if (!inOutSamples.containsKey(inDeg)) {
@@ -322,7 +383,7 @@ void drawLine() {
       }
       inOutSamples.get(inDeg).add(outDeg);
 
-      // --- このノードの出力制限数を確率分布で決める ---
+      // 出力分岐数を確率で決める（まだ決まっていない場合のみ）
       if (!branchLimitPerNode.containsKey(keyB)) {
         int limit = getBranchCountFromDistribution(inDeg);
         branchLimitPerNode.put(keyB, limit);
@@ -380,7 +441,9 @@ void drawDebugInfo() {
   for (String key : sortedKeys) {
     int inC = debugInDegreeMap.getOrDefault(key, 0);
     int outC = debugOutDegreeMap.getOrDefault(key, 0);
-    text(key + " → 入力: " + inC + ", 出力: " + outC, 100, y);
+    int mp = mpMap.getOrDefault(key, -1);
+    text(key + " → 入力: " + inC + ", 出力: " + outC + ", MP: " + mp, 120, y);
+
     y += 20;
   }
 }
