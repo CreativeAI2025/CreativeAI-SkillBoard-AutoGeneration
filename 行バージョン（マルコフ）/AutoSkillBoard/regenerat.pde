@@ -73,7 +73,7 @@ void drawAdditionalLinesFor(ArrayList<String> keysToConnect) {
       String keyB = b.x + "," + b.y;
 
       // 線を描画
-      float hueVal = map(d, 0, maxDist, 0, 360);
+      float hueVal = map(d, 0, rows, 0, 360);
       stroke(hueVal, 80, 100, 200);
       strokeWeight(2);
       line(aPos.x, aPos.y, b.pos.x, b.pos.y);
@@ -89,7 +89,7 @@ void drawAdditionalLinesFor(ArrayList<String> keysToConnect) {
 }
 
 
-boolean hasIsolatedNodes() {
+boolean hasIsolatedNodes() {// 親の有無の判定
   for (String key : nodeColors.keySet()) {
     // 入力が0かつ行が0でない（スタートノード以外）
     int inC = inDegreeMap.getOrDefault(key, 0);

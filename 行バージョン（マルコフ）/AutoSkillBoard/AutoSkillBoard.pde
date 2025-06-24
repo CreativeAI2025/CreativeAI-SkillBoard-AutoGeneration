@@ -1,37 +1,34 @@
 import java.util.*;
-PFont font;
+PFont font;//フォント
 
-int cols = 11;
-int rows = 11;
-int cellSize = 75;
-int retryCount = 0;
-int maxRetry = 1000;
-int globalMaxInput = 3;
+int cols = 11;//列
+int rows = 11;//行
+int cellSize = 75;//１マスの大きさ
+int retryCount = 0;//再設置のカウント
+int maxRetry = 1000;//再設置の最大回数
+int globalMaxInput = 6;//入力の最大数
 
-PVector[][] prev = new PVector[cols][rows];
-boolean[][] nodechack = new boolean[cols][rows];
-boolean[][] visited = new boolean[cols][rows];
+PVector[][] prev = new PVector[cols][rows];//実座標
+boolean[][] nodechack = new boolean[cols][rows];//ノードの有無
 
-int[][] dist = new int[cols][rows];
-int maxDist = 0;
+int[][] dist = new int[cols][rows];//探索距離
 
-HashMap<Integer, Integer> nodeLimitPerDist = new HashMap<>();
-HashMap<String, Integer> branchLimitPerNode = new HashMap<>();
-HashMap<String, Integer> maxInputPerNode = new HashMap<>();
-HashMap<Integer, ArrayList<PVector>> nodePositionsPerRow = new HashMap<>();
-HashMap<String, Integer> nodeColors = new HashMap<>(); // ← 色の格納用
+HashMap<Integer, Integer> nodeLimitPerDist = new HashMap<>();//各階層のノード数の制限
+HashMap<String, Integer> branchLimitPerNode = new HashMap<>();//各階層の枝数の制限
+HashMap<String, Integer> maxInputPerNode = new HashMap<>();//枝の受入可能数の制限
+HashMap<Integer, ArrayList<PVector>> nodePositionsPerRow = new HashMap<>();//各階層のノードの探索座標の格納
+HashMap<String, Integer> nodeColors = new HashMap<>(); //色の格納用
 HashMap<String, Integer> inDegreeMap = new HashMap<>();//入力カウント
 HashMap<String, Integer> outDegreeMap = new HashMap<>();//出力カウント
-HashMap<Integer, ArrayList<Integer>> inOutSamples = new HashMap<>();
-HashMap<Integer, float[]> branchProbByInDegree = new HashMap<>();
-HashMap<String, Integer> debugInDegreeMap = new HashMap<>();
-HashMap<String, Integer> debugOutDegreeMap = new HashMap<>();
+HashMap<Integer, float[]> branchProbByInDegree = new HashMap<>();//マルコフ過程による確率分布
+HashMap<String, Integer> debugInDegreeMap = new HashMap<>();// 入力の数
+HashMap<String, Integer> debugOutDegreeMap = new HashMap<>();// 出力の数
 HashMap<String, Integer> mpMap = new HashMap<>();  // ノードのMP情報を保存
-HashMap<Integer, float[]> mpDistByLevel = new HashMap<>();
-HashMap<String, float[]> mpDistByColorType = new HashMap<>();
+HashMap<Integer, float[]> mpDistByLevel = new HashMap<>();// MP配置の確率分布
+HashMap<String, float[]> mpDistByColorType = new HashMap<>();// スキル配置の確率分布
 
 void setup() {
-  fullScreen();
+  fullScreen();//画面サイズ
   colorMode(HSB, 360, 100, 100, 255);
 
   // 日本語を含むフォントを指定
@@ -79,71 +76,59 @@ void draw() {
   }
 }
 
-void applyBranchingBasedOnInDegree() {
+void applyBranchingBasedOnInDegree() {// 入力数に基づいて、出力数を決める
   for (String key : nodeColors.keySet()) {
-    int inCount = inDegreeMap.getOrDefault(key, 0);
+    int inCount = inDegreeMap.getOrDefault(key, 0);// 入力数
     int branchLimit = getBranchCountFromDistribution(inCount);//確率に基づいて出力数を決める関数
-    branchLimitPerNode.put(key, branchLimit);
+    branchLimitPerNode.put(key, branchLimit); //各階層の枝数の制限を追加
   }
 }
 
-int determineBranchCount(int inDegree) {
-  float r = random(1);
-  if (inDegree == 0) return 3;
-  else if (inDegree == 1) return r < 0.6 ? 1 : 2;
-  else if (inDegree == 2) return r < 0.5 ? 1 : 0;
-  else return 0;
-}
-
-int getBranchCountFromDistribution(int inDegree) {
-  float[] probs = branchProbByInDegree.getOrDefault(inDegree, new float[]{1.0});
-  float r = random(1);
-  float sum = 0;
+int getBranchCountFromDistribution(int inDegree) {//確率に基づいて出力数を決める関数
+  float[] probs = branchProbByInDegree.getOrDefault(inDegree, new float[]{1.0});// その階層での分岐確率を入れる
+  float r = random(1);//0~0.9999..までの乱数
+  float sum = 0;//確率の和
   for (int i = 0; i < probs.length; i++) {
     sum += probs[i];
-    if (r < sum) return i;
+    if (r < sum) return i;//枝の本数を返す
   }
-  return probs.length - 1;
+  return probs.length - 1;//枝の本数を返す
 }
 
 // MPをサンプリングする関数を定義
 int getMpFromDistribution(float[] probs) {
-  float r = random(1);
-  float sum = 0;
+  float r = random(1);//0~0.9999..までの乱数
+  float sum = 0;//確率の和
   for (int i = 0; i < probs.length; i++) {
     sum += probs[i];
-    if (r < sum) return i + 1;
+    if (r < sum) return i + 1;//MPを返す
   }
-  return probs.length;
+  return probs.length;//MPを返す
 }
 
 
-void reset() {
+void reset() {//初期化
   for (int x = 0; x < cols; x++) {
     for (int y = 0; y < rows; y++) {
       dist[x][y] = -1;
       prev[x][y] = null;
       nodechack[x][y] = false;
-      visited[x][y] = false;
     }
   }
-  
-  maxDist = 0;
+
   maxInputPerNode.clear();
-  
+
   inputPerBranch();
-  
+
   branchLimitPerNode.clear();
   nodePositionsPerRow.clear();
   nodeColors.clear();
 }
 
-void setRowDistances() {
+void setRowDistances() {//探索距離の設定
   for (int y = 0; y < rows; y++) {
     for (int x = 0; x < cols; x++) {
-      dist[x][y] = y;
-      visited[x][y] = true;
-      if (y > maxDist) maxDist = y;
+      dist[x][y] = y;// 探索距離
     }
   }
 }
@@ -154,20 +139,14 @@ void drawGrid() {
   float startX = width / 2 - gridWidth / 2;
   float startY = 0;
 
-  for (int x = 0; x < cols; x++) {
-    for (int y = 0; y < rows; y++) {
-      int d = dist[x][y];
-      if (d >= 0) fill(255);
-      else fill(0);
-      stroke(0);
-      rect(startX + x * cellSize, startY + y * cellSize, cellSize, cellSize);
+  for (int y = 0; y < rows; y++) {
+    if (y >= 0) fill(255);
+    else fill(0);
+    stroke(0);
+    rect(startX, startY + y * cellSize, cellSize * cols, cellSize);
 
-      if (d >= 0) {
-        fill(0);
-        textAlign(CENTER, CENTER);
-        text(d, startX + x * cellSize + cellSize / 2, startY + y * cellSize + cellSize / 2);
-      }
-    }
+      fill(0);
+      text(y, startX + cellSize / 2, startY + y * cellSize + cellSize / 2);
   }
 }
 
@@ -362,7 +341,7 @@ void drawLine() {
       }
 
       // 線を描画
-      float hueVal = map(a.dist, 0, maxDist, 0, 360);
+      float hueVal = map(a.dist, 0, rows, 0, 360);
       stroke(hueVal, 80, 100, 200);
       strokeWeight(2);
       line(a.pos.x, a.pos.y, b.pos.x, b.pos.y);
@@ -377,11 +356,11 @@ void drawLine() {
 
       // 入出力サンプル記録
       int inDeg = inDegreeMap.getOrDefault(keyB, 0);
-      int outDeg = outDegreeMap.getOrDefault(keyB, 0);
-      if (!inOutSamples.containsKey(inDeg)) {
-        inOutSamples.put(inDeg, new ArrayList<Integer>());
-      }
-      inOutSamples.get(inDeg).add(outDeg);
+      //int outDeg = outDegreeMap.getOrDefault(keyB, 0);
+      //if (!inOutSamples.containsKey(inDeg)) {
+      //  inOutSamples.put(inDeg, new ArrayList<Integer>());
+      //}
+      //inOutSamples.get(inDeg).add(outDeg);
 
       // 出力分岐数を確率で決める（まだ決まっていない場合のみ）
       if (!branchLimitPerNode.containsKey(keyB)) {
