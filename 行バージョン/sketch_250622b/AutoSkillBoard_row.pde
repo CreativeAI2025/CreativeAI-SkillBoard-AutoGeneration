@@ -1,5 +1,4 @@
 import java.util.*;
-PFont font;
 
 int cols = 11;
 int rows = 11;
@@ -16,18 +15,12 @@ HashMap<Integer, Integer> nodeLimitPerDist = new HashMap<>();
 HashMap<String, Integer> branchLimitPerNode = new HashMap<>();
 HashMap<Integer, ArrayList<PVector>> nodePositionsPerRow = new HashMap<>();
 HashMap<String, Integer> nodeColors = new HashMap<>(); // ← 色の格納用
-HashMap<String, Integer> inDegreeMap = new HashMap<>();//入力カウント
-HashMap<String, Integer> outDegreeMap = new HashMap<>();//出力カウント
 
 void setup() {
   fullScreen();
   colorMode(HSB, 360, 100, 100, 255);
-
-  // 日本語を含むフォントを指定
-  font = createFont("MS Gothic", 16);
-  textFont(font);
-
   reset();
+
   setRowDistances();
   cloudNodesLimit();
   cloudLinesLimit();
@@ -40,10 +33,6 @@ void draw() {
   drawGrid();
   nodeSet();
   drawLine();
-
-  if (showDebug) {
-    drawDebugInfo();
-  }
 }
 
 void reset() {
@@ -125,7 +114,7 @@ void nodeSet() {
             c = color(240, 100, 100);   // 青
           }
           nodeColors.put(x + "," + y, c);
-        } else if (y == (int)rows / 3) {
+        }else if (y == (int)rows / 3) {
           float r = random(1);
           if (r <= 1) {
             c = color(0, 100, 100);     // 赤
@@ -133,7 +122,7 @@ void nodeSet() {
             c = color(240, 100, 100);   // 青
           }
           nodeColors.put(x + "," + y, c);
-        } else if (y < rows * 2 / 3) {
+        }else if (y < rows * 2 / 3) {
           float r = random(1);
           if (r < 0.381) {
             c = color(0, 100, 100);     // 赤
@@ -141,7 +130,7 @@ void nodeSet() {
             c = color(240, 100, 100);   // 青
           }
           nodeColors.put(x + "," + y, c);
-        } else if (y == (int)rows * 2 / 3) {
+        }else if (y == (int)rows * 2 / 3) {
           float r = random(1);
           if (r < 0.292) {
             c = color(0, 100, 100);     // 赤
@@ -149,7 +138,7 @@ void nodeSet() {
             c = color(240, 100, 100);   // 青
           }
           nodeColors.put(x + "," + y, c);
-        } else {
+        }else{
           float r = random(1);
           if (r < 0.388) {
             c = color(0, 100, 100);     // 赤
@@ -194,10 +183,6 @@ void nodeSet() {
 }
 
 void drawLine() {
-  inDegreeMap.clear();
-  outDegreeMap.clear();
-
-
   class Node {
     PVector pos;
     int dist;
@@ -246,26 +231,16 @@ void drawLine() {
     for (Node b : nextNodes) {
       if (countA >= limitA) break;
 
-      String keyB = b.x + "," + b.y;
-
-      // 線を描画
       float hueVal = map(a.dist, 0, maxDist, 0, 360);
       stroke(hueVal, 80, 100, 200);
       strokeWeight(2);
       line(a.pos.x, a.pos.y, b.pos.x, b.pos.y);
 
-      // 出力・入力カウント
-      outDegreeMap.put(keyA, outDegreeMap.getOrDefault(keyA, 0) + 1);
-      inDegreeMap.put(keyB, inDegreeMap.getOrDefault(keyB, 0) + 1);
-
-      // 出力制限数を更新
       countA++;
       branchCounts.put(keyA, countA);
     }
   }
 }
-
-boolean showDebug = false;
 
 void keyPressed() {
   if (key == 'r' || key == 'R') {
@@ -274,44 +249,5 @@ void keyPressed() {
     cloudNodesLimit();
     cloudLinesLimit();
     redraw();
-  }
-
-  if (key == 'd' || key == 'D') {
-    showDebug = !showDebug;
-    redraw(); // 再描画が必要
-  }
-}
-
-void drawDebugInfo() {
-  fill(0);
-  textSize(14);
-  int y = 100;
-  text("---- ノードの入出力 ----", 100, y);
-  y += 20;
-
-  // keySet を並べ替え：y行 → x列の順
-  ArrayList<String> sortedKeys = new ArrayList<>(nodeColors.keySet());
-
-  Collections.sort(sortedKeys, new Comparator<String>() {
-    public int compare(String a, String b) {
-      String[] ap = a.split(",");
-      String[] bp = b.split(",");
-      int ax = Integer.parseInt(ap[0]);
-      int ay = Integer.parseInt(ap[1]);
-      int bx = Integer.parseInt(bp[0]);
-      int by = Integer.parseInt(bp[1]);
-
-      if (ay != by) return ay - by; // y優先（行順）
-      return ax - bx;               // x昇順（列順）
-    }
-  }
-  );
-
-  // 並べた順で出力
-  for (String key : sortedKeys) {
-    int inC = inDegreeMap.getOrDefault(key, 0);
-    int outC = outDegreeMap.getOrDefault(key, 0);
-    text(key + " → 入力: " + inC + ", 出力: " + outC, 100, y);
-    y += 20;
   }
 }

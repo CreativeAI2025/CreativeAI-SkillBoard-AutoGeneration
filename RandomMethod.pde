@@ -1,3 +1,3 @@
-public int randomInt(int a,int b){
-  return (int)random(a,b);
+int randomInt(int min, int max) {
+  return floor(random(min, max + 1));
 }

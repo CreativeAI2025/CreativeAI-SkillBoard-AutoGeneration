@@ -25,17 +25,22 @@
 //HashMap<Integer, Integer> nodeLimitPerDist = new HashMap<Integer, Integer>();
 //HashMap<Integer, Integer> branchLimitPerDist = new HashMap<Integer, Integer>();
 
+//// ★ノード単位の枝数上限制御用マップ（キー："x,y"）
+//HashMap<String, Integer> branchLimitPerNode = new HashMap<>();
+
 //boolean[][] nodechack = new boolean[cols][rows];
 //int maxDist = 0;
 
 //void setup() {
 //  fullScreen();
 
-//  defaultNodesLimit();
-//  defaultLinesLimit();
+//  //defaultNodesLimit();
+//  //defaultLinesLimit();
 
-//  //nodeLimits();
-//  //lineLimits();
+//  // ノード単位の枝数上限設定例
+//  // ノード(3,4)の枝数上限を2に設定
+//  branchLimitPerNode.put("3,4", 2);
+//  branchLimitPerNode.put("1,1", 1);  // 他にも必要なら追加
 
 //  reset();
 //  startPosBFS();
@@ -76,12 +81,12 @@
 //      prev[x][y] = null;
 //      nodechack[x][y] = false;
 //      hasParent[x][y] = false;
-//      visited[x][y] = false;
+//      visited[x][y] = false;  // visitedもリセット
 //    }
 //  }
 //  maxDist = 0;
+//  queue.clear();
 //}
-
 
 //void startPosBFS() {
 //  queue.clear();
@@ -166,13 +171,14 @@
 //    }
 //  }
 
-//  stroke(255, 180);
 //  strokeWeight(2);
 
 //  for (Node a : allNodes) {
 //    String keyA = a.x + "," + a.y;
 //    int countA = branchCounts.getOrDefault(keyA, 0);
-//    int limitA = branchLimitPerDist.getOrDefault(a.dist, 999);
+
+//    // ノード単位の枝数上限があれば使い、なければ距離ごとの上限
+//    int limitA = branchLimitPerNode.getOrDefault(keyA, branchLimitPerDist.getOrDefault(a.dist, 999));
 
 //    if (a.dist != 0 && !hasParent[a.x][a.y]) continue;
 //    if (!distMap.containsKey(a.dist + 1)) continue;
@@ -181,13 +187,15 @@
 //    Collections.shuffle(nextNodes);
 
 //    for (Node b : nextNodes) {
-//      if (countA >= limitA) break; // aの分岐数上限に達したら終了
+//      if (countA >= limitA) break;
 
 //      String keyB = b.x + "," + b.y;
 //      int countB = branchCounts.getOrDefault(keyB, 0);
-//      int limitB = branchLimitPerDist.getOrDefault(b.dist, 999);
+//      int limitB = branchLimitPerNode.getOrDefault(keyB, branchLimitPerDist.getOrDefault(b.dist, 999));
+//      if (countB >= limitB) continue;
 
-//      if (countB >= limitB) continue; // bの分岐数超過
+//      // 線の色を階層ごとに変える例（お好みで）
+//      stroke(255, 180);
 
 //      // 線を引く
 //      line(a.pos.x, a.pos.y, b.pos.x, b.pos.y);
@@ -199,11 +207,24 @@
 //  }
 //}
 
+//// ノード数制限の初期値設定例
+//void defaultNodesLimit() {
+//  for (int i = 0; i < rows + cols; i++) {
+//    nodeLimitPerDist.put(i, 999);
+//  }
+//}
+
+//// 枝数制限の初期値設定例
+//void defaultLinesLimit() {
+//  for (int i = 0; i < rows + cols; i++) {
+//    branchLimitPerDist.put(i, 999);
+//  }
+//}
+
+//// キーで再生成
 //void keyPressed() {
 //  if (key == 'r' || key == 'R') {
 //    reset();
-//    queue.clear();
-//    visited = new boolean[cols][rows]; // ここは任意、念のため再初期化
 //    startPosBFS();
 //    BFSSearch();
 //    loop();
