@@ -180,6 +180,8 @@
 //    ArrayList<Node> nextNodes = new ArrayList<Node>(distMap.get(a.dist + 1));
 //    Collections.shuffle(nextNodes);
 
+//    boolean connectedAtLeastOnce = false; // 次距離のノードとの接続確保用
+
 //    for (Node b : nextNodes) {
 //      if (countA >= limitA) break; // aの分岐数上限に達したら終了
 
@@ -195,6 +197,27 @@
 //      branchCounts.put(keyA, countA);
 //      branchCounts.put(keyB, countB + 1);
 //      hasParent[b.x][b.y] = true;
+
+//      connectedAtLeastOnce = true;
+
+//      // 次距離ノードと最低1本は繋ぐので、枝数上限前でもbreakすることもあり
+//      // ただし最大まで繋ぎたいならbreakなしで続行もOK
+//      //break; // ←繋ぐ数を1本に限定したいならここを有効化
+//    }
+
+//    // もし1本もつながっていなければ、枝数制限無視して強制接続を試みる
+//    if (!connectedAtLeastOnce) {
+//      for (Node b : nextNodes) {
+//        String keyB = b.x + "," + b.y;
+//        if (!hasParent[b.x][b.y]) {
+//          line(a.pos.x, a.pos.y, b.pos.x, b.pos.y);
+//          countA++;
+//          branchCounts.put(keyA, countA);
+//          branchCounts.put(keyB, branchCounts.getOrDefault(keyB, 0) + 1);
+//          hasParent[b.x][b.y] = true;
+//          break;
+//        }
+//      }
 //    }
 //  }
 //}

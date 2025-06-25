@@ -3,7 +3,9 @@ PFont font;
 
 int cols = 11;
 int rows = 11;
-int cellSize = 50;
+int cellSize = 75;
+int retryCount = 0;
+int maxRetry = 1000;
 
 PVector[][] prev = new PVector[cols][rows];
 boolean[][] nodechack = new boolean[cols][rows];
@@ -18,6 +20,10 @@ HashMap<Integer, ArrayList<PVector>> nodePositionsPerRow = new HashMap<>();
 HashMap<String, Integer> nodeColors = new HashMap<>(); // ← 色の格納用
 HashMap<String, Integer> inDegreeMap = new HashMap<>();//入力カウント
 HashMap<String, Integer> outDegreeMap = new HashMap<>();//出力カウント
+HashMap<Integer, ArrayList<Integer>> inOutSamples = new HashMap<>();
+HashMap<Integer, float[]> branchProbByInDegree = new HashMap<>();
+HashMap<String, Integer> debugInDegreeMap = new HashMap<>();
+HashMap<String, Integer> debugOutDegreeMap = new HashMap<>();
 
 void setup() {
   fullScreen();
@@ -30,9 +36,8 @@ void setup() {
   reset();
   setRowDistances();
   cloudNodesLimit();
-  cloudLinesLimit();
-
-  noLoop();
+  //cloudLinesLimit();
+  setupBranchingDistributionFromData();
 }
 
 void draw() {
@@ -40,11 +45,59 @@ void draw() {
   drawGrid();
   nodeSet();
   drawLine();
+  debugInDegreeMap = new HashMap<>(inDegreeMap);
+  debugOutDegreeMap = new HashMap<>(outDegreeMap);
+  applyBranchingBasedOnInDegree();
+  regenerateDisconnectedNodes();
 
   if (showDebug) {
     drawDebugInfo();
   }
+
+  println("Retry Count: " + retryCount);
+
+  fill(0);
+  textSize(20);
+  text("Retry Count: " + retryCount, 100, 30);
+
+  if (!hasIsolatedNodes() || retryCount > maxRetry) {
+    noLoop();
+  } else {
+    retryCount++;
+    reset();
+    setRowDistances();
+    cloudNodesLimit();
+    setupBranchingDistributionFromData();  // 再生成準備
+  }
 }
+
+void applyBranchingBasedOnInDegree() {
+  for (String key : nodeColors.keySet()) {
+    int inCount = inDegreeMap.getOrDefault(key, 0);
+    int branchLimit = getBranchCountFromDistribution(inCount);//確率に基づいて出力数を決める関数
+    branchLimitPerNode.put(key, branchLimit);
+  }
+}
+
+int determineBranchCount(int inDegree) {
+  float r = random(1);
+  if (inDegree == 0) return 3;
+  else if (inDegree == 1) return r < 0.6 ? 1 : 2;
+  else if (inDegree == 2) return r < 0.5 ? 1 : 0;
+  else return 0;
+}
+
+int getBranchCountFromDistribution(int inDegree) {
+  float[] probs = branchProbByInDegree.getOrDefault(inDegree, new float[]{1.0});
+  float r = random(1);
+  float sum = 0;
+  for (int i = 0; i < probs.length; i++) {
+    sum += probs[i];
+    if (r < sum) return i;
+  }
+  return probs.length - 1;
+}
+
 
 void reset() {
   for (int x = 0; x < cols; x++) {
@@ -193,23 +246,22 @@ void nodeSet() {
   }
 }
 
+class Node {
+  PVector pos;
+  int dist;
+  int x, y;
+
+  Node(PVector pos, int dist, int x, int y) {
+    this.pos = pos;
+    this.dist = dist;
+    this.x = x;
+    this.y = y;
+  }
+}
+
 void drawLine() {
   inDegreeMap.clear();
   outDegreeMap.clear();
-
-
-  class Node {
-    PVector pos;
-    int dist;
-    int x, y;
-
-    Node(PVector pos, int dist, int x, int y) {
-      this.pos = pos;
-      this.dist = dist;
-      this.x = x;
-      this.y = y;
-    }
-  }
 
   ArrayList<Node> allNodes = new ArrayList<>();
   HashMap<Integer, ArrayList<Node>> distMap = new HashMap<>();
@@ -261,24 +313,41 @@ void drawLine() {
       // 出力制限数を更新
       countA++;
       branchCounts.put(keyA, countA);
+
+      // --- 入力に基づく出力分岐数のデータ記録 ---
+      int inDeg = inDegreeMap.getOrDefault(keyB, 0);
+      int outDeg = outDegreeMap.getOrDefault(keyB, 0);
+      if (!inOutSamples.containsKey(inDeg)) {
+        inOutSamples.put(inDeg, new ArrayList<Integer>());
+      }
+      inOutSamples.get(inDeg).add(outDeg);
+
+      // --- このノードの出力制限数を確率分布で決める ---
+      if (!branchLimitPerNode.containsKey(keyB)) {
+        int limit = getBranchCountFromDistribution(inDeg);
+        branchLimitPerNode.put(keyB, limit);
+      }
     }
   }
 }
 
-boolean showDebug = false;
+boolean showDebug = true;
 
 void keyPressed() {
   if (key == 'r' || key == 'R') {
     reset();
+    retryCount = 0;
     setRowDistances();
     cloudNodesLimit();
-    cloudLinesLimit();
+    setupBranchingDistributionFromData();
+    //cloudLinesLimit();
+    loop();
     redraw();
   }
 
   if (key == 'd' || key == 'D') {
     showDebug = !showDebug;
-    redraw(); // 再描画が必要
+    redraw();
   }
 }
 
@@ -309,8 +378,8 @@ void drawDebugInfo() {
 
   // 並べた順で出力
   for (String key : sortedKeys) {
-    int inC = inDegreeMap.getOrDefault(key, 0);
-    int outC = outDegreeMap.getOrDefault(key, 0);
+    int inC = debugInDegreeMap.getOrDefault(key, 0);
+    int outC = debugOutDegreeMap.getOrDefault(key, 0);
     text(key + " → 入力: " + inC + ", 出力: " + outC, 100, y);
     y += 20;
   }
