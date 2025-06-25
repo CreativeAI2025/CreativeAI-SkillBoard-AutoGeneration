@@ -1,4 +1,5 @@
 ArrayList<Node> nodeData = new ArrayList<>();
+ArrayList<Node> lineData = new ArrayList<>();
 
 public class Node {
   private int id;
@@ -11,7 +12,10 @@ public class Node {
   private int skill;
   private int status;
 
-  Node(int id, int dist_x, int dist_y,float x, float y) {//コンストラクタ
+  private int inputCount = 0;   // 入力された回数（どこからか来た回数）
+  private int outputCount = 0;  // 出力した回数（どこかへ出した回数）
+
+  Node(int id, int dist_x, int dist_y, float x, float y) {//コンストラクタ(ノード描写用)
     this.id = id;
     this.distX = dist_x;
     this.distY = dist_y;
@@ -19,14 +23,10 @@ public class Node {
     this.y = y;
   }
 
-  Node(int id,PVector pos) {
+  Node(int id, int input, int output) {//コンストラクタ（ライン描写用）
     this.id = id;
-    this.pos = pos;
-  }
-
-  Node(float x, float y) {//コンストラクタ
-    this.x = x;
-    this.y = y;
+    this.input = input;
+    this.output = output;
   }
 
   public int getId() {
@@ -49,7 +49,47 @@ public class Node {
     return this.y;
   }
 
-  public void setId(int id) {
-    this.id = id;
+  public int getInput() {
+    return this.input;
+  }
+
+  public int getOutput() {
+    return this.output;
+  }
+
+  void addInput() {
+    inputCount++;
+  }
+  void addOutput() {
+    outputCount++;
+  }
+
+  int getInputCount() {
+    return inputCount;
+  }
+  int getOutputCount() {
+    return outputCount;
+  }
+}
+
+void NodeCheck() {
+  fill(255);
+  stroke(0);
+  rect(50, 120, 250, 1000);
+
+  //for (Node n : nodeData) {
+  //  print("ID:" + n.getId());
+  //  print("探索距離:" + n.getDistX() + "," + n.getDistY());
+  //  println("実座標:" + n.getX() + "," + n.getY());
+  //}
+
+  for (Node n : lineData) {
+    //print("ID:" + n.getId());
+    //println("入力:"+ n.getInputCount() +"出力:" + n.getOutputCount());
+
+    fill(0);
+    textSize(16);
+    textAlign(LEFT, CENTER);
+    text("ID:" + n.getId() + "入力:"+ n.getInputCount() +"出力:" + n.getOutputCount(), 100, 16 * n.getId() + 200);
   }
 }

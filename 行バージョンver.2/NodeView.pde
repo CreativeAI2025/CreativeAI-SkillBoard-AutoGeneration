@@ -1,5 +1,4 @@
 void nodeView() {
-  drawGrid();//グリッドの表示
   drawNodes();//ノードの表示
   drawId();//IDの表示
 }
