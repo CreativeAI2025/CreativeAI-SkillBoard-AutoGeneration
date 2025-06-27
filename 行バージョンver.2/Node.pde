@@ -1,16 +1,17 @@
 ArrayList<Node> nodeData = new ArrayList<>();
 ArrayList<Node> lineData = new ArrayList<>();
+ArrayList<Node> skillData = new ArrayList<>();
 
 public class Node {
   private int id;
-  private PVector pos;//ノードの実座標
   private int distX, distY;//ノードの探索距離
-  private float x, y;//ノードの探索座標
+  private float x, y;//ノードの実座標
   private int mp; // MP（コスト）
   private int input;
   private int output;
-  private int skill;
-  private int status;
+  private String skill_name;
+  private String status_name;
+  private int status_up;
 
   private int inputCount = 0;   // 入力された回数（どこからか来た回数）
   private int outputCount = 0;  // 出力した回数（どこかへ出した回数）
@@ -27,6 +28,17 @@ public class Node {
     this.id = id;
     this.input = input;
     this.output = output;
+  }
+  
+  Node(String skill_name,int mp){
+    this.skill_name = skill_name;
+    this.mp = mp;
+  }
+  
+  Node(String status_name,int mp, int status_up){
+    this.status_name = status_name;
+    this.mp = mp;
+    this.status_up = status_up;
   }
 
   public int getId() {
