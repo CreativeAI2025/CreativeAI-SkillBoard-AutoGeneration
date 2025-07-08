@@ -42,19 +42,19 @@ void reset() {
 }
 
 void view() {
-  int maxRetry = 2000;
+  int maxRetry = 100;
   int retry = 0;
 
-  //do {
-  //  set();
-  //  retry++;
-  //  if (retry > maxRetry) {
-  //    println("警告: 入力0ノードが消せませんでした");
-  //    break;
-  //  }
-  //} while (hasNodeWithZeroInput());  // ← 入力ゼロがあれば再生成
+  do {
+    set();
+    retry++;
+    if (retry > maxRetry) {
+      //println("警告: 入力0ノードが消せませんでした");
+      break;
+    }
+  } while (hasNodeWithZeroInput());
 
-  set();
+  //set();
   fill(255);
   stroke(0);
   rect(50, 50, 100, 60);
@@ -78,5 +78,26 @@ void keyPressed() {
 }
 
 boolean hasNodeWithZeroInput() {
+  ArrayList<Integer> endList = new ArrayList<>();
+  for (int[] pair : connections) {
+    //println(pair[0]+"→"+pair[1]);
+    endList.add(pair[1]);
+  }
+
+  Collections.sort(endList);
+
+  //for (Integer list: endList) {
+  //  println(list);
+  //}
+
+  for (int i = 1; i < nodeSum; i++) {
+    if (endList.contains(i)) {
+      //println(i + " はリストに含まれています");
+    } else {
+      println(i + " はリストに含まれていません");
+      return true;
+    }
+  }
+
   return false;
 }

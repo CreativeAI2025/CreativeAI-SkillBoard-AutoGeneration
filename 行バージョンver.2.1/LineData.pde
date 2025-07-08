@@ -56,14 +56,14 @@ void connectRange(int nowStart, int nowEnd, int beforeStart, int nextEnd) {
 
     while (used.size() < branchCount) {
       int j = (int) random(beforeStart, nextEnd + 1); // beforeStart ~ nextEnd のランダム
-      if (!used.contains(j)) {
+      if (!used.contains(j) && i != j && nowStart < j && j > nowEnd) {
         connections.add(new int[]{i, j});
         used.add(j);
       }
 
       tries++;
       if (tries > 1000) { // 無限ループ防止
-        println("Too many tries at node " + i);
+        //println("Too many tries at node " + i);
         break;
       }
     }
@@ -81,7 +81,7 @@ void generateRandomConnections() {
 
   for (int y = 0; y < rows; y++) {
 
-    if (y < rows - 1) println(sum, sum + nodelimitPerRow.get(y) - 1,bsum, sum + + nodelimitPerRow.get(y) + nodelimitPerRow.get(y + 1) - 1);
+    //if (y < rows - 1) println(sum, sum + nodelimitPerRow.get(y) - 1,bsum, sum + + nodelimitPerRow.get(y) + nodelimitPerRow.get(y + 1) - 1);
     if (y < rows - 1) connectRange(sum, sum + nodelimitPerRow.get(y) - 1,bsum, sum + + nodelimitPerRow.get(y) + nodelimitPerRow.get(y + 1) - 1);
     bsum = sum;
     sum += nodelimitPerRow.get(y); 
