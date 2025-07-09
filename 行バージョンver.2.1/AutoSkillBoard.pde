@@ -29,16 +29,21 @@ void draw() {
 void set() {
   //setRowDistances();//探索距離の設定
   reset();
-  NodeLimitSet();
+
+  NodeLimitData();
   NodeDataSet();
-  lineLimitSet();
+
+  lineLimitData();
   generateRandomConnections();
+
+  SkillOrStatusData();
 }
 
 void reset() {
   nodeSum = 0;
   nodeData.clear();
   lineData.clear();
+  tagData.clear();
 }
 
 void view() {
@@ -57,10 +62,15 @@ void view() {
   //set();
   fill(255);
   stroke(0);
-  rect(50, 50, 100, 60);
+  rect(50, 50, 300, 60);
   fill(0);
   text(retry, 100, 100);
 
+
+  TagSet();
+  
+  text("スキル:" + skillCount + "ステータス:" + statusCount,150,100);
+  
   drawGrid();//グリッドの表示
   lineView();
   nodeView();
@@ -94,7 +104,7 @@ boolean hasNodeWithZeroInput() {
     if (endList.contains(i)) {
       //println(i + " はリストに含まれています");
     } else {
-      println(i + " はリストに含まれていません");
+      //println(i + " はリストに含まれていません");
       return true;
     }
   }

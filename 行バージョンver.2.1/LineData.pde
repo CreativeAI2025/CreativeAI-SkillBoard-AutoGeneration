@@ -1,6 +1,5 @@
-HashMap<Integer, float[]> linelimitPerRow = new HashMap<>();//枝数の制限
+ArrayList<Node> lineData = new ArrayList<>();//ラインデータの保存
 ArrayList<int[]> connections = new ArrayList<int[]>();// IDの遷移を記録
-
 
 int getBranchCountFromDistribution(int branch) {//今の数を受け取り、確率に基づいて次の枝数を決める関数
   float[] probs = linelimitPerRow.getOrDefault(branch, new float[]{0.0});// その階層での枝数の確率分布を入れる
@@ -86,15 +85,4 @@ void generateRandomConnections() {
     bsum = sum;
     sum += nodelimitPerRow.get(y); 
   }
-}
-
-void lineLimitSet() {//入力枝数に対して出力枝数の確率(最高枝数６)
-  // 枝1のとき → 枝1: 50%, 枝2: 30%, 枝3: 20%
-  linelimitPerRow.put(0, new float[]{0, 0, 0, 0, 0, 0, 0});
-  linelimitPerRow.put(1, new float[]{0.1, 0.000, 0.123, 0.246, 0.140, 0.000, 0.018});
-  linelimitPerRow.put(2, new float[]{0, 0.028, 0.008, 0.272, 0.192, 0.016, 0.484});
-  linelimitPerRow.put(3, new float[]{0, 0.114, 0.553, 0.000, 0.000, 0.008, 0.325});
-  linelimitPerRow.put(4, new float[]{0, 0.095, 0.571, 0.000, 0.333, 0.000, 0.000});
-  linelimitPerRow.put(5, new float[]{0, 0, 0.8, 0.2, 0, 0, 0});
-  linelimitPerRow.put(6, new float[]{0, 0.006, 0.747, 0.247, 0.000, 0.000, 0.000});
 }

@@ -1,16 +1,12 @@
-ArrayList<Node> nodeData = new ArrayList<>();
-ArrayList<Node> lineData = new ArrayList<>();
-ArrayList<Node> skillData = new ArrayList<>();
-
 public class Node {
-  private int id;
+  private int id;//各ノードのID
   private int distX, distY;//ノードの探索距離
   private float x, y;//ノードの実座標
   private int mp; // MP（コスト）
   private int branch;//枝の数
-  private String skill_name;
-  private String status_name;
-  private int status_up;
+  private String tag;//タグ名（スキルorステータス）
+  private String name;//スキル・ステータスの名前
+  private String explain;//スキル・ステータスの情報（文の中に数字とラベルを入れること）
 
   private int inputCount = 0;   // 入力された回数（どこからか来た回数）
   private int outputCount = 0;  // 出力した回数（どこかへ出した回数）
@@ -27,20 +23,25 @@ public class Node {
     this.id = id;
     this.branch = branch;
   }
-
-  Node(String skill_name, int mp) {
-    this.skill_name = skill_name;
-    this.mp = mp;
+  
+  Node(int id, String tag){//コンストラクタ（スキル・ステータス用）
+    this.id = id;
+    this.tag = tag;
   }
 
-  Node(String status_name, int mp, int status_up) {
-    this.status_name = status_name;
-    this.mp = mp;
-    this.status_up = status_up;
+  Node(String name, String explain) {//コンストラクタ（スキル・ステータス用（詳細情報））
+    this.id = 0;
+    this.name = name;
+    this.explain = explain;
+    this.mp = 0;
   }
 
   public int getId() {
     return this.id;
+  }
+  
+  public void setId(int id){
+    this.id = id;
   }
 
   public int getDistX() {
@@ -61,6 +62,18 @@ public class Node {
 
   public int getBranch() {
     return this.branch;
+  }
+  
+  public String getTag() {
+    return this.tag;
+  }
+  
+  public int getMp(){
+    return this.mp;
+  }
+  
+  public void setMp(int mp){
+    this.mp = mp;
   }
 }
 
@@ -84,4 +97,8 @@ void NodeCheck() {
     textAlign(LEFT, CENTER);
     //text("ID:" + n.getId() + "枝:"+ n.getInputCount());
   }
+  
+  //for(Node n : tagData){
+  //  println("ID:" + n.getId() + "タグ名:"+ n.getTag());
+  //}
 }

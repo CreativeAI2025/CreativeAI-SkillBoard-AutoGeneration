@@ -20,7 +20,15 @@ void drawNodes() {
   for (Node n : nodeData) {
 
     if (n.getDistY() == 0) fill(255, 255, 0);
-    if (n.getDistY() != 0) fill(255);
+    if (n.getDistY() != 0){
+      if(tagData.get(n.getId()).getTag() == "スキル"){
+        fill(255,0,0);
+      }else if(tagData.get(n.getId()).getTag() == "ステータス"){
+        fill(0,0,255);
+      }else{
+        fill(0);
+      }
+    }
 
     ellipse(n.getX(), n.getY(), cellSize / 1.5, cellSize / 1.5);
   }
