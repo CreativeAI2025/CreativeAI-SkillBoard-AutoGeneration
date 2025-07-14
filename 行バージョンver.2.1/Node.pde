@@ -2,11 +2,9 @@ public class Node {
   private int id;//各ノードのID
   private int distX, distY;//ノードの探索距離
   private float x, y;//ノードの実座標
-  private int mp; // MP（コスト）
   private int branch;//枝の数
+  
   private String tag;//タグ名（スキルorステータス）
-  private String name;//スキル・ステータスの名前
-  private String explain;//スキル・ステータスの情報（文の中に数字とラベルを入れること）
 
   private int inputCount = 0;   // 入力された回数（どこからか来た回数）
   private int outputCount = 0;  // 出力した回数（どこかへ出した回数）
@@ -27,13 +25,6 @@ public class Node {
   Node(int id, String tag){//コンストラクタ（スキル・ステータス用）
     this.id = id;
     this.tag = tag;
-  }
-
-  Node(String name, String explain) {//コンストラクタ（スキル・ステータス用（詳細情報））
-    this.id = 0;
-    this.name = name;
-    this.explain = explain;
-    this.mp = 0;
   }
 
   public int getId() {
@@ -67,14 +58,6 @@ public class Node {
   public String getTag() {
     return this.tag;
   }
-  
-  public int getMp(){
-    return this.mp;
-  }
-  
-  public void setMp(int mp){
-    this.mp = mp;
-  }
 }
 
 void NodeCheck() {
@@ -101,4 +84,8 @@ void NodeCheck() {
   //for(Node n : tagData){
   //  println("ID:" + n.getId() + "タグ名:"+ n.getTag());
   //}
+  
+  for (Skill s : nodeSkillData) {
+    println(s);
+  }
 }

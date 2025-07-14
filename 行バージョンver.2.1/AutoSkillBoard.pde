@@ -1,5 +1,6 @@
 import java.util.*;
 import java.util.Collections;
+
 PFont font;
 
 int cols = 11;//列
@@ -29,14 +30,12 @@ void draw() {
 void set() {
   //setRowDistances();//探索距離の設定
   reset();
-
-  NodeLimitData();
+  
+  DataSet();
+  
   NodeDataSet();
 
-  lineLimitData();
   generateRandomConnections();
-
-  SkillOrStatusData();
 }
 
 void reset() {
@@ -68,6 +67,7 @@ void view() {
 
 
   TagSet();
+  SkillDataSet();
   
   text("スキル:" + skillCount + "ステータス:" + statusCount,150,100);
   

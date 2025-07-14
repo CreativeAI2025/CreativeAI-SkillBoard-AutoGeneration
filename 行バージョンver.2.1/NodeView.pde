@@ -21,9 +21,9 @@ void drawNodes() {
 
     if (n.getDistY() == 0) fill(255, 255, 0);
     if (n.getDistY() != 0){
-      if(tagData.get(n.getId()).getTag() == "スキル"){
+      if(tagData.get(n.getId()) == "スキル"){
         fill(255,0,0);
-      }else if(tagData.get(n.getId()).getTag() == "ステータス"){
+      }else if(tagData.get(n.getId()) == "ステータス"){
         fill(0,0,255);
       }else{
         fill(0);

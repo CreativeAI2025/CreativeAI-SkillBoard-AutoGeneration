@@ -41,7 +41,7 @@ void reset() {
 }
 
 void view() {
-  int maxRetry = 1000;
+  int maxRetry = 2000;
   int retry = 0;
 
   do {
@@ -53,6 +53,7 @@ void view() {
     }
   } while (hasNodeWithZeroInput());  // ← 入力ゼロがあれば再生成
 
+  set();
   fill(255);
   stroke(0);
   rect(50, 50, 100, 60);

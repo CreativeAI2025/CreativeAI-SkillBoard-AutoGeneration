@@ -1,4 +1,4 @@
-ArrayList<Node> tagData = new ArrayList<>();//ノードがスキル又はステータスなのかの保存
+HashMap<Integer, String> tagData = new HashMap<>();// IDとスキル・ステータスの格納
 int skillCount = 0;
 int statusCount = 0;
 
@@ -9,19 +9,17 @@ void TagSet() {//すきる・ステータスの振り分け
     int to = pair[1];
 
     if (from == 0 && !usedid.contains(to)) {
-      tagData.add(new Node(to, tagName("初期状態")));
+      tagData.put(to, tagName("初期状態"));
     }
 
     if (!usedid.contains(to)) {
-      tagData.add(new Node(to, tagName(tagData.get(from).getTag())));
+      tagData.put(to, tagName(tagData.get(from)));
     }
     usedid.add(to);
   }
 
-  Comparator<Node> compare = Comparator.comparing(Node::getId);
-  tagData.sort(compare);//昇順ソート
-  println("タグセット");
-  SScount(tagData);
+  //println("タグセット");
+  SScount();
 }
 
 String tagName(String tag) {//前の状態を受け取り、確率に基づいて次の状態を決める関数
@@ -50,12 +48,12 @@ String tagName(String tag) {//前の状態を受け取り、確率に基づい�
   return null;
 }
 
-void SScount(ArrayList<Node> tagData) {
+void SScount() {
   skillCount = 0;
   statusCount = 0;
 
-  for (Node t : tagData) {
-    if (t.getTag() == "スキル") {
+  for (int i = 0; i < tagData.size(); i++) {
+    if (tagData.get(i) == "スキル") {
       skillCount++;
     }else{
       statusCount++;

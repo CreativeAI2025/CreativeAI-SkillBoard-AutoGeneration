@@ -3,7 +3,7 @@ ArrayList<int[]> connections = new ArrayList<int[]>();// IDの遷移を記録
 
 
 int getBranchCountFromDistribution(int inDegree) {//入力数を受け取り、確率に基づいて出力数を決める関数
-  float[] probs = linelimitPerRow.getOrDefault(inDegree, new float[]{1.0});// その階層での分岐確率を入れる
+  float[] probs = linelimitPerRow.getOrDefault(inDegree, new float[]{0.0});// その階層での分岐確率を入れる
   float r = random(1);//0~0.9999..までの乱数
   float sum = 0;//確率の和
   for (int i = 0; i < probs.length; i++) {
@@ -30,18 +30,23 @@ void initializeNodes(int totalNodes) {
 
 //      fromNode.addOutput();
 //      toNode.addInput();
-      
+
 //      connections.add(new int[]{i, j});
 //    }
 //  }
 //}
 
 void connectRange(int fromStart, int fromEnd, int toStart, int toEnd) {
-  for (int i = fromStart; i <= fromEnd; i++) {
-    Node fromNode = lineData.get(i);
 
+  for (int i = fromStart; i <= fromEnd; i++) {
+    int inDegree;
     // 出力先候補を作成
     ArrayList<Integer> toCandidates = new ArrayList<>();
+    Node fromNode;
+    inDegree = 0;
+    fromNode = lineData.get(i);
+    toCandidates = new ArrayList<>();
+
     for (int j = toStart; j <= toEnd; j++) {
       toCandidates.add(j);
     }
@@ -50,7 +55,8 @@ void connectRange(int fromStart, int fromEnd, int toStart, int toEnd) {
     Collections.shuffle(toCandidates);
 
     // fromNode の入力数を取得（ここでは便宜上 inputCount を inDegree とみなす）
-    int inDegree = fromNode.getInputCount();
+    inDegree = fromNode.getInputCount();
+    //print("s");
 
     // 入力数に応じた分岐数（出力数）を確率的に決定
     int branchCount = getBranchCountFromDistribution(inDegree);
