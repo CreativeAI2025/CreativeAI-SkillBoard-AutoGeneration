@@ -19,7 +19,7 @@ public class Node {
 
   Node(int id, int branch) {//コンストラクタ（ライン描写用）
     this.id = id;
-    this.branch = branch;
+    this.branch = branch;//1つのノードに生える枝数
   }
   
   Node(int id, String tag){//コンストラクタ（スキル・ステータス用）
@@ -55,6 +55,20 @@ public class Node {
     return this.branch;
   }
   
+  void addInput() {
+    inputCount++;
+  }
+  void addOutput() {
+    outputCount++;
+  }
+
+  int getInputCount() {
+    return inputCount;
+  }
+  int getOutputCount() {
+    return outputCount;
+  }
+  
   public String getTag() {
     return this.tag;
   }
@@ -78,7 +92,7 @@ void NodeCheck() {
     fill(0);
     textSize(16);
     textAlign(LEFT, CENTER);
-    //text("ID:" + n.getId() + "枝:"+ n.getInputCount());
+    text("ID:" + n.getId() + "枝:"+ n.getBranch(),100,200 + 20 * n.getId());
   }
   
   //for(Node n : tagData){
@@ -86,6 +100,7 @@ void NodeCheck() {
   //}
   
   for (Skill s : nodeSkillData) {
-    println(s);
+    //println(s);
   }
+  println();
 }

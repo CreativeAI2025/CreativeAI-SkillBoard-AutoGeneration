@@ -2,7 +2,7 @@ HashMap<Integer, String> tagData = new HashMap<>();// IDとスキル・ステー
 int skillCount = 0;
 int statusCount = 0;
 
-void TagSet() {//すきる・ステータスの振り分け
+void TagSet() {//スキル・ステータスの振り分け
   HashSet<Integer> usedid = new HashSet<>();
   for (int[] pair : connections) {
     int from = pair[0];

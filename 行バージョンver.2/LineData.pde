@@ -94,10 +94,7 @@ void generateRandomConnections() {
 void lineLimitSet() {//入力枝数に対して出力枝数の確率(最高6分岐)
   // 入力1のとき → 出力1: 50%, 出力2: 30%, 出力3: 20%
   linelimitPerRow.put(0, new float[]{0, 0, 0, 0, 0, 0, 0});
-  linelimitPerRow.put(1, new float[]{0.1, 0.000, 0.123, 0.246, 0.140, 0.000, 0.018});
-  linelimitPerRow.put(2, new float[]{0, 0.028, 0.008, 0.272, 0.192, 0.016, 0.484});
-  linelimitPerRow.put(3, new float[]{0, 0.114, 0.553, 0.000, 0.000, 0.008, 0.325});
-  linelimitPerRow.put(4, new float[]{0, 0.095, 0.571, 0.000, 0.333, 0.000, 0.000});
-  linelimitPerRow.put(5, new float[]{0, 0, 0.8, 0.2, 0, 0, 0});
-  linelimitPerRow.put(6, new float[]{0, 0.006, 0.747, 0.247, 0.000, 0.000, 0.000});
+  linelimitPerRow.put(1, new float[]{0.188,  0.713,  0.099,  0.000,  0.000});
+  linelimitPerRow.put(2, new float[]{0.000,  0.286,  0.143,  0.286,  0.286});
+  linelimitPerRow.put(3, new float[]{0.000,  1.000,  0.000,  0.000,  0.000});
 }

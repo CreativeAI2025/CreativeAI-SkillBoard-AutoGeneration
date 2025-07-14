@@ -43,10 +43,11 @@ void reset() {
   nodeData.clear();
   lineData.clear();
   tagData.clear();
+  nodeSkillData.clear();
 }
 
 void view() {
-  int maxRetry = 100;
+  int maxRetry = 1000;
   int retry = 0;
 
   do {
@@ -104,7 +105,7 @@ boolean hasNodeWithZeroInput() {
     if (endList.contains(i)) {
       //println(i + " はリストに含まれています");
     } else {
-      //println(i + " はリストに含まれていません");
+      println(i + " はリストに含まれていません");
       return true;
     }
   }
