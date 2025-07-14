@@ -86,6 +86,6 @@ void NodeCheck() {
   //}
   
   for (Skill s : nodeSkillData) {
-    println(s);
+    //println(s);
   }
 }
