@@ -6,7 +6,6 @@ void SkillDataSet() {
       serchSkillDescription(skillData.get(i));
     }
   }
-
 }
 
 /*contains:ある文字列が別の文字列の中に含まれているかどうかをチェックするメソッド

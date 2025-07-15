@@ -25,20 +25,18 @@ void NodeLimitData() {//各階層でノードの個数の制限
   nodelimitPerRow.put(8, 1);
   nodelimitPerRow.put(9, 2);
   nodelimitPerRow.put(10, 1);
-  //nodelimitPerRow.put(11, 1);
-  //nodelimitPerRow.put(12, 1);
-  //nodelimitPerRow.put(13, 1);
 }
 
-void lineLimitData() {//入力枝数に対して出力枝数の確率(最高枝数６)
-  // 枝1のとき → 枝1: 50%, 枝2: 30%, 枝3: 20%
+void lineLimitData() {//階層のノード数に対して枝数の確率(最高枝数６)
+  // 階層のノード数が2個のとき → 枝1: 50%, 枝2: 30%, 枝3: 20%
   linelimitPerRow.put(0, new float[]{0, 0, 0, 0, 0, 0, 0});
-  linelimitPerRow.put(1, new float[]{0.1, 0.000, 0.123, 0.246, 0.140, 0.000, 0.018});
-  linelimitPerRow.put(2, new float[]{0, 0.028, 0.008, 0.272, 0.192, 0.016, 0.484});
-  linelimitPerRow.put(3, new float[]{0, 0.114, 0.553, 0.000, 0.000, 0.008, 0.325});
-  linelimitPerRow.put(4, new float[]{0, 0.095, 0.571, 0.000, 0.333, 0.000, 0.000});
-  linelimitPerRow.put(5, new float[]{0, 0, 0.8, 0.2, 0, 0, 0});
-  linelimitPerRow.put(6, new float[]{0, 0.006, 0.747, 0.247, 0.000, 0.000, 0.000});
+  linelimitPerRow.put(1, new float[]{0, 0, 0, 0, 1, 0.000, 0.00});
+  linelimitPerRow.put(2, new float[]{0, 0.05, 0.05, 0, 0, 0, 0.9});
+  linelimitPerRow.put(3, new float[]{0, 0, 0, 0, 1, 0, 0});
+  linelimitPerRow.put(4, new float[]{0, 0, 1, 0, 0, 0.000, 0.000});
+  linelimitPerRow.put(5, new float[]{0, 0, 0, 0.6, 0, 0, 0.4});
+  linelimitPerRow.put(6, new float[]{0, 0, 0, 0, 0.000, 0.000, 0.000});
+  linelimitPerRow.put(7, new float[]{0, 0, 1, 0, 0.000, 0.000, 0.000});
 }
 
 void SkillOrStatusData() {//入力に対して次がスキルまたステータスの確率(スキル、ステータス、初期状態)

@@ -4,6 +4,14 @@ int statusCount = 0;
 
 void TagSet() {//スキル・ステータスの振り分け
   HashSet<Integer> usedid = new HashSet<>();
+  
+  Collections.sort(connections, new Comparator<int[]>() {
+            @Override
+            public int compare(int[] a, int[] b) {
+                return Integer.compare(a[0], b[0]);
+            }
+        });
+  
   for (int[] pair : connections) {
     int from = pair[0];
     int to = pair[1];

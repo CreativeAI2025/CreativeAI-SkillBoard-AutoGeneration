@@ -6,7 +6,7 @@ PFont font;
 int cols = 11;//列
 int rows = 11;//行
 int cellSize = 75;//行間距離
-int nodeSum = 0;//ノードの数のカウント
+int nodeSum = -1;//ノードの数のカウント
 
 //PVector[][] prev = new PVector[cols][rows];//座標
 //boolean[][] nodechack = new boolean[cols][rows];//ノードの有無
@@ -47,7 +47,7 @@ void reset() {
 }
 
 void view() {
-  int maxRetry = 1000;
+  int maxRetry = 0;
   int retry = 0;
 
   do {
@@ -105,7 +105,7 @@ boolean hasNodeWithZeroInput() {
     if (endList.contains(i)) {
       //println(i + " はリストに含まれています");
     } else {
-      println(i + " はリストに含まれていません");
+      //println(i + " はリストに含まれていません");
       return true;
     }
   }
