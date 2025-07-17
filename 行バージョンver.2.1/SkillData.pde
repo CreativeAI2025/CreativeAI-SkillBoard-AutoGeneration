@@ -2,9 +2,7 @@ ArrayList<Skill> nodeSkillData = new ArrayList<>();//スキルをもつノード
 
 void SkillDataSet() {
   for (int i = 0; i < skillData.size(); i++) {
-    if (tagData.get(i) == "スキル") {
-      serchSkillDescription(skillData.get(i));
-    }
+    serchSkillDescription(skillData.get(i));
   }
 }
 
@@ -22,13 +20,14 @@ void serchSkillDescription(String[] skilldata) {
   String action = null;//行動(攻撃、回復など)
   int power = -1;//効果量
   String type = null;//種類（物理攻撃、特殊攻撃など）
+  String status = null;
   String extra = null;//追加効果
   int duration = -1;//持続ターン
 
   //対象の抽出
-  if (explain.contains("相手に")) {
+  if (explain.contains("相手に")|explain.contains("相手を")) {
     subject = "相手";
-  } else if (explain.contains("味方1人の")|explain.contains("味方1人の")) {
+  } else if (explain.contains("味方1人の")|explain.contains("味方1人を")) {
     subject = "味方1人";
   } else if (explain.contains("味方全体の")) {
     subject = "味方全体";
@@ -46,7 +45,7 @@ void serchSkillDescription(String[] skilldata) {
     action = "攻撃";
     type = result[2] + "攻撃";
   }
-  
+
   // 回復
   result = match(explain, "(\\d+)回復");
   if (result != null) {
@@ -54,23 +53,52 @@ void serchSkillDescription(String[] skilldata) {
     type = "回復";
   }
   
+  // 回復(割合)
+  result = match(explain, "(\\d+)%回復");
+  if (result != null) {
+    power = int(result[1]);
+    type = "%回復";
+  }
+  
+  //復活
+  result = match(explain, "(\\d+)で復活");
+  if (result != null) {
+    power = int(result[1]);
+    type = "%で復活";
+  }
+
+  //復活(割合)
+  result = match(explain, "(\\d+)%で復活");
+  if (result != null) {
+    power = int(result[1]);
+    type = "%で復活";
+  }
 
   //バフ・デバフ（持続ターン含む）の抽出
   result = match(explain, "(\\d+)ターン");
   if (result != null) {
     duration = int(result[1]);
     if (explain.contains("上昇") || explain.contains("アップ")) {
-      action = "バフ";
+      type = "バフ";
     } else if (explain.contains("低下") || explain.contains("ダウン")) {
-      action = "デバフ";
+      type = "デバフ";
+    }
+    
+    if (explain.contains("回避率")) {
+      status = "回避率";
+    }
+    if (explain.contains("魔法防御率")) {
+      status = "魔法防御";
+    }
+    if (explain.contains("防御力")) {
+      status = "防御力";
     }
   }
 
   //追加効果の抽出
-  if (explain.contains("毒")) extra = "poison";
-  else if (explain.contains("麻痺")) extra = "paralysis";
-  else if (explain.contains("睡眠")) extra = "sleep";
-  else if (explain.contains("復活")) extra = "revive";
+  if (explain.contains("毒")) type = "毒";
+  else if (explain.contains("麻痺")) type = "麻痺";
+  else if (explain.contains("睡眠")) type = "眠ら";
 
-  nodeSkillData.add(new Skill(name, subject, action, power, type, extra, duration));
+  nodeSkillData.add(new Skill(name, subject, action, power, type, status, extra, duration));
 }

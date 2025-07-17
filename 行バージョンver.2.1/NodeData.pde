@@ -2,6 +2,10 @@ ArrayList<Node> nodeData = new ArrayList<>();//ノードデータの保存
 
 void NodeDataSet() {
   int id = 0;
+  for (int x = 0; x < nodelimitPerRow.size(); x++) {
+      rows++;
+    }
+  
   for (int y = 0; y < rows; y++) {
     for (int x = 0; x < nodelimitPerRow.get(y); x++) {
       nodeSum++;

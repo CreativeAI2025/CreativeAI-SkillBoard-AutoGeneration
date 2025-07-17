@@ -36,8 +36,8 @@ void drawNodes() {
 
 void drawId() {
   for (Node n : nodeData) {
-    float drawPosX = n.getDistX() * cellSize - nodelimitPerRow.get(n.getDistY()) * cellSize / 2 + width / 2 + cellSize / 2;
-    float drawPosY = n.getDistY() * cellSize + cellSize /2;
+    float drawPosX = n.getX();
+    float drawPosY = n.getY();
 
     fill(0);
     textSize(16);

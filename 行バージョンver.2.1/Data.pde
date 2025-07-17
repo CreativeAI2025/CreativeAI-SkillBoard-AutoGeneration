@@ -13,7 +13,6 @@ void DataSet() {
 }
 
 void NodeLimitData() {//各階層でノードの個数の制限
-  rows = 11;
   nodelimitPerRow.put(0, 1);
   nodelimitPerRow.put(1, 2);
   nodelimitPerRow.put(2, 4);
@@ -52,12 +51,12 @@ void SkillData() {//ユーザが触るのはここだけ
   skillData.put(3, new String[]{"サンダーストライク", "相手に180ダメージの特殊攻撃"});
   skillData.put(4, new String[]{"ファイアボール", "相手に120ダメージの特殊攻撃"});
   skillData.put(5, new String[]{"アイスシールド", "味方全体の防御力を2ターン上昇させる"});
-  skillData.put(6, new String[]{"ポイズンニードル", "相手に50ダメージ＋毒状態にする"});
+  skillData.put(6, new String[]{"ポイズンニードル", "相手を3ターンの間毒状態にする"});
   skillData.put(7, new String[]{"ブレイブスラッシュ", "相手に160ダメージの物理攻撃"});
   skillData.put(8, new String[]{"マジックバリア", "味方全体の魔法防御力を3ターン上昇させる"});
   skillData.put(9, new String[]{"リザレクション", "味方1人をHP30%で復活させる"});
   skillData.put(10, new String[]{"シャドウステップ", "自分の回避率を2ターン上昇させる"});
-  skillData.put(11, new String[]{"ギガインパクト", "相手に300ダメージの大技。次ターン行動不可"});
+  skillData.put(11, new String[]{"ギガインパクト", "相手に300ダメージの物理攻撃"});
   skillData.put(12, new String[]{"ウィンドカッター", "相手に130ダメージの特殊攻撃"});
 }
 

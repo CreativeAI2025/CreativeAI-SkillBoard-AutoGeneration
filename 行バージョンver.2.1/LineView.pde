@@ -7,7 +7,7 @@ void drawLine() {//IDを参照し線を結ぶ
     int from = pair[0];
     int to = pair[1];
 
-    println(from + " → " + to);//変移
+    //println(from + " → " + to);//変移
     //println(pair);
 
     float currentX = nodeData.get(from).getX();

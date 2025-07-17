@@ -3,7 +3,7 @@ public class Node {
   private int distX, distY;//ノードの探索距離
   private float x, y;//ノードの実座標
   private int branch;//枝の数
-  
+
   private String tag;//タグ名（スキルorステータス）
 
   private int inputCount = 0;   // 入力された回数（どこからか来た回数）
@@ -21,8 +21,8 @@ public class Node {
     this.id = id;
     this.branch = branch;//1つのノードに生える枝数
   }
-  
-  Node(int id, String tag){//コンストラクタ（スキル・ステータス用）
+
+  Node(int id, String tag) {//コンストラクタ（スキル・ステータス用）
     this.id = id;
     this.tag = tag;
   }
@@ -30,8 +30,8 @@ public class Node {
   public int getId() {
     return this.id;
   }
-  
-  public void setId(int id){
+
+  public void setId(int id) {
     this.id = id;
   }
 
@@ -54,7 +54,7 @@ public class Node {
   public int getBranch() {
     return this.branch;
   }
-  
+
   void addInput() {
     inputCount++;
   }
@@ -68,7 +68,7 @@ public class Node {
   int getOutputCount() {
     return outputCount;
   }
-  
+
   public String getTag() {
     return this.tag;
   }
@@ -92,15 +92,24 @@ void NodeCheck() {
     fill(0);
     textSize(16);
     textAlign(LEFT, CENTER);
-    text("ID:" + n.getId() + "枝:"+ n.getBranch(),100,200 + 20 * n.getId());
+    text("ID:" + n.getId() + "枝:"+ n.getBranch(), 100, 200 + 20 * n.getId());
   }
   
+  fill(255);
+  stroke(0);
+  rect(50, 50, 300, 60);
+  fill(0);
+  text(retry, 100, 100);//再生成の回数
+
+  text("スキル:" + skillCount + "ステータス:" + statusCount, 150, 100);//スキル・ステータスの数
+
   //for(Node n : tagData){
   //  println("ID:" + n.getId() + "タグ名:"+ n.getTag());
   //}
-  
+
   for (Skill s : nodeSkillData) {
+    println(s.toSkillString(s.type));
     //println(s);
   }
-  println();
+  //println();
 }

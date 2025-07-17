@@ -4,7 +4,7 @@ import java.util.Collections;
 PFont font;
 
 int cols = 11;//列
-int rows = 11;//行
+int rows;//行
 int cellSize = 75;//行間距離
 int nodeSum = -1;//ノードの数のカウント
 
@@ -30,15 +30,16 @@ void draw() {
 void set() {
   //setRowDistances();//探索距離の設定
   reset();
-  
+
   DataSet();
-  
+
   NodeDataSet();
 
   generateRandomConnections();
 }
 
 void reset() {
+  rows = 0;
   nodeSum = 0;
   nodeData.clear();
   lineData.clear();
@@ -46,9 +47,13 @@ void reset() {
   nodeSkillData.clear();
 }
 
+int maxRetry = 0;
+int retry = 0;
+
 void view() {
-  int maxRetry = 0;
-  int retry = 0;
+  maxRetry = 100;
+  retry = 0;
+  background(200);
 
   do {
     set();
@@ -60,19 +65,11 @@ void view() {
   } while (hasNodeWithZeroInput());
 
   //set();
-  fill(255);
-  stroke(0);
-  rect(50, 50, 300, 60);
-  fill(0);
-  text(retry, 100, 100);
-
 
   TagSet();
   SkillDataSet();
-  
-  text("スキル:" + skillCount + "ステータス:" + statusCount,150,100);
-  
-  drawGrid();//グリッドの表示
+
+  //drawGrid();//グリッドの表示
   lineView();
   nodeView();
   NodeCheck();
