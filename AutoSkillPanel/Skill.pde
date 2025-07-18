@@ -57,6 +57,10 @@ public class Skill {
         return "スキル:" + name + " 説明：" + subject + "の" + status + "を" + duration + "ターン上昇させる";
       }else if ("デバフ".equals(type)) {
         return "スキル:" + name + " 説明：" + subject + "の" + status + "を" + duration + "ターン減少させる";
+      }else if ("毒".equals(type)) {
+        return "スキル:" + name + " 説明：" + subject + "を" + duration + "ターン" + type + "状態にする";
+      }else if ("%で復活".equals(type)) {
+        return "スキル:" + name + " 説明：" + subject + "をHP" + power + type + "させる";
       }
     }
     return "スキル名: " + name

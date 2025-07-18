@@ -3,15 +3,11 @@ import java.util.Collections;
 
 PFont font;
 
-int cols = 11;//列
-int rows;//行
-int cellSize = 75;//行間距離
-int nodeSum = -1;//ノードの数のカウント
-
-//PVector[][] prev = new PVector[cols][rows];//座標
-//boolean[][] nodechack = new boolean[cols][rows];//ノードの有無
-
-//int[][] dist = new int[cols][rows];//探索距離
+float cellSize = 75;
+int skillsum = 0;
+int statussum = 0;
+int startPosX;
+int startPosY;
 
 void setup() {
   background(255);
@@ -21,6 +17,10 @@ void setup() {
   font = createFont("MS Gothic", 16);
   textFont(font);
 
+  startPosX = width/2;
+  startPosY = height/2;
+
+
   view();
 }
 
@@ -28,89 +28,34 @@ void draw() {
 }
 
 void set() {
-  //setRowDistances();//探索距離の設定
-  reset();
-  
-  DataSet();
-  
-  NodeDataSet();
 
-  generateRandomConnections();
+  reset();
+
+  DataSet();
+
+  NodeDataSet();
 }
 
 void reset() {
-  rows = 0;
-  nodeSum = 0;
   nodeData.clear();
-  lineData.clear();
-  tagData.clear();
-  nodeSkillData.clear();
 }
 
 void view() {
-  int maxRetry = 0;
-  int retry = 0;
   background(255);
+  set();
 
-  do {
-    set();
-    retry++;
-    if (retry > maxRetry) {
-      //println("警告: 入力0ノードが消せませんでした");
-      break;
-    }
-  } while (hasNodeWithZeroInput());
+  NodeView();
 
-  //set();
-  fill(255);
-  stroke(0);
-  //rect(50, 50, 300, 60);
-  fill(0);
-  //text(retry, 100, 100);
-
-
-  TagSet();
-  SkillDataSet();
-  
-  //text("スキル:" + skillCount + "ステータス:" + statusCount,150,100);
-  
-  //drawGrid();//グリッドの表示
-  lineView();
-  nodeView();
-  //NodeCheck();
+  NodeCheck();
 }
 
 void keyPressed() {
   if (key == 'r' || key == 'R') {
+    reset();
     view();
   }
 
   if (key == 'd' || key == 'D') {
     redraw();
   }
-}
-
-boolean hasNodeWithZeroInput() {
-  ArrayList<Integer> endList = new ArrayList<>();
-  for (int[] pair : connections) {
-    //println(pair[0]+"→"+pair[1]);
-    endList.add(pair[1]);
-  }
-
-  Collections.sort(endList);
-
-  //for (Integer list: endList) {
-  //  println(list);
-  //}
-
-  for (int i = 1; i < nodeSum; i++) {
-    if (endList.contains(i)) {
-      //println(i + " はリストに含まれています");
-    } else {
-      //println(i + " はリストに含まれていません");
-      return true;
-    }
-  }
-
-  return false;
 }
