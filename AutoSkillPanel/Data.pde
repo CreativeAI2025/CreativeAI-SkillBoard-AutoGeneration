@@ -1,4 +1,6 @@
 HashMap<Integer, float[]> nodePerData = new HashMap<>();//ノードの出現確率
+HashMap<Integer, float[]> linelimitPerRow = new HashMap<>();//遷移による枝数の制限
+HashMap<String, float[]> skill_or_statusPerRow = new HashMap<>();//スキル・ステータスの変移確率(スキル、ステータス、初期状態)
 HashMap<Integer, String[]> skillData = new HashMap<>();// スキル名とスキルの説明のデータ
 
 void DataSet() {
@@ -14,6 +16,12 @@ void NodePerData() {
   nodePerData.put(4, new float[]{0.2, 0.2, 0.2, 0.2, 0.2, 0.2});
   nodePerData.put(5, new float[]{0.2, 0.2, 0.2, 0.2, 0.2, 0.2});
   nodePerData.put(6, new float[]{0.5, 0.5, 0, 0, 0, 0});//初期状態
+}
+
+void SkillOrStatusData() {//入力に対して次がスキルまたステータスの確率(スキル、ステータス、初期状態)
+  skill_or_statusPerRow.put("スキル", new float[]{0.518, 0.482});
+  skill_or_statusPerRow.put("ステータス", new float[]{0.435, 0.565});
+  skill_or_statusPerRow.put("初期状態", new float[]{0.857, 0.143});//初期状態
 }
 
 void SkillData() {//ユーザが触るのはここだけ

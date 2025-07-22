@@ -52,7 +52,7 @@ void SkillStatusCount() {
   }
 
   statussum = (skillsum * 2)/3;//スキル・ステータスの統計的比率により算出
-  println(skillsum, statussum);
+  //println(skillsum, statussum);
 }
 
 void NodeDataSet() {
@@ -86,7 +86,7 @@ void NodeDataSet() {
       nodeData.add(new Node(i, distX, distY, startPosX, startPosY));
     } else {
       boolean validPos = false;
-      int maxRetry = 10;
+      int maxRetry = 100;
       int retry = 0;
 
       while (!validPos && retry < maxRetry) {
